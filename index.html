@@ -1,0 +1,225 @@
+<html></html>
+<head>
+<title>Vue.js Pet Depot</title>
+<script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="mainfest" href="petstore.webmenefiest">
+
+<style>
+    .product{
+        border: 1px grey solid;
+        padding: 20px;
+        margin: 20px;
+        text-align:  center;
+
+    }
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+<h1 v-text="sitename"></h1>
+<button v-on:click='showCheckout'>
+    {{ cartItemCount }}
+    <span class="fas fa-cart-plus"></span>Checkout
+</button>
+</header>
+<main>
+    <div v-if='showProduct'>
+        <div class="product" v-for="product in sortedProducts">
+            
+        
+    <figure>
+    <!-- bind 'src' attr to 'product.image' in 'data' -->
+    <img v-bind:src="product.image">
+    </figure>
+    <h2 v-text="product.title"></h2>
+    <p v-text="product.description"></p>
+    <!-- The double curly brackets is used instead of 'v-text' -->
+    <p>Price: {{product.price}}</p>
+    <p>AvailableStock: {{product.availableInventory}} </p>
+   
+        <button v-on:click="addToCart(product)" v-if="canAddToCart">AddToCart</button>
+       
+        <!-- <span v-if="product.availableInventory - cartItemCount  5">
+            Only {{product.availableInventory - cartItemCount}} left!
+            </span> -->
+            
+            <button disabled="disabled" v-else>AddToCart</button>
+   
+            <span v-if='product.availableInventory === cartCount(product.id)'>All out!</span>
+            <span v-else-if="product.availableInventory - cartCount(product.id) < 5">
+                Only {{product.availableInventory - cartCount(product.id)}} left!
+            </span>
+            <span v-else>Buy now!</span>
+            <div>
+                <span v-for='n in product.rating'>★</span>
+                <span v-for='n in 5 - product.rating'>☆</span>
+            </div>
+        </div>
+
+    </div>
+<div v-else>
+    <h2>checkout</h2>
+    <p>
+        <strong>First Name:</strong>
+        <input v-model.trim="order.firstname"/>
+    </p>
+    <p>
+        <strong>Last Name:</strong>
+        <input v-model="order.lastname"/>
+    </p>
+    <p>
+        <strong>Address:</strong> <input v-model="order.address"/>
+    </p>
+    <p>
+        <strong>city:</strong> <input v-model="order.city"/>
+    </p>
+    <p>
+        <strong>State:</strong>
+        <select v-model="order.state" class="form-control">
+            <option v-for=" (state,key) in states" v-bind:value="state">
+               {{key}} 
+            </option>
+
+            <!-- <option disabled value="">State</option>
+            <option v-bind:value="states.AL">AL</option>
+            <option v-bind:value="states.AR">AR</option>
+            <option v-bind:value="states.CA">CA</option>
+            <option v-bind:value="states.NV">NV</option> -->
+
+            </select>
+           
+    </p>
+    <p>
+    <strong>Zip Postal Code:</strong> 
+    <input v-model.number="order.Zip" type="number"/>
+    <p>
+        <input type="checkbox" id="gift" value="true" v-model="order.gift"
+        
+        v-bind:true-value="order.sendGift"
+        v-bind:false-value="order.dontSendGift">
+        <label for="gift">Ship As Gift?</label></p>
+    <p>
+        <input type="radio" id="home" value="home" v-model="order.method">
+         <label for="home">Home</label>
+        <input type="radio" id="Business" value="Business" v-model="order.method">
+        <label for="Business">Business</label>
+        </p>
+
+</p>
+    <h2>order Information</h2>
+    <p>First Name: {{order.firstname}}</p>
+    <p>Last Name: {{order.lastname}}</p>
+    <p>Address: {{order.address}}</p>
+    <p>City: {{order.City}}</p>
+    <p>Zip: {{order.Zip}}</p>
+    <p>State: {{order.State}}</p>
+    <p>Gift? {{order.gift}}</p>
+    <button v-on:click="submitForm">Place Order</button>
+
+    
+     </div>
+
+
+</div>
+<script src="product.js"></script>
+<script type="text/javascript">
+var webstore = new Vue({
+el: '#app', // <=== Don't forget this comma
+data: {  // the 'data' option
+// the key 'sitename' matches the value of 'v-text' earlier
+ sitename: "example",
+ showProduct: true,
+ order: {
+    firstname: '',
+    lastname: '',
+    address: '',
+    city: '',
+    state: '',
+            method:'Home',
+            gift:false,
+               sendGift: 'Send as a gift',
+            dontSendGift: 'Do ot send as a gift'
+
+ },
+
+states:{
+    AL:'Alabama',
+    AR:'Arizona',
+    CA:'California',
+    NV:'Nevada'
+    
+    
+},
+
+
+// product: {
+// id: 1001,
+// title: "Cat Food, 25lb bag",
+// description: "Selling exotic Dog meat and cat meat as well ranging from a variety of diffrent breeds",
+// price: 2000,
+// image: "image/product-fullsize.png",
+// availableInventory: 10,
+// rating:3
+// },
+products: products,
+cart: [] // array to store items in shopping cart
+},
+methods:{
+    addToCart:function(product) {
+        this.cart.push(product.id);
+    },
+    showCheckout() {
+        this.showProduct=this.showProduct ? false : true;
+    },
+    submitForm() {alert('Order submitted!')},
+    canAddToCart:function(product) {
+        return product.availableInventory>this.cartCount(product.id);
+    },
+    cartCount(id){
+        let count = 0;
+        for (let i = 0; i < this.cart.length; i++){
+            if(this.cart[i] === id){
+                count++;
+            }
+        }
+        return count;
+    }
+ 
+ 
+},
+computed: { // the Computed Property object
+cartItemCount: function() { // the property name
+// its value is calculated when it is called
+return this.cart.length || "";
+},
+
+sortedProducts(){
+    let productsArray = this.products.slice(0);
+    function compare(a,b){
+        if (a.price > b.price)
+            return 1;
+        if(a.price < b.price)
+            return -1;
+     return 0; }
+     
+        return productsArray.sort(compare);
+     },
+     itemsLeft() {
+        return this.product.availableInventory - this.cartItemCount;
+    }
+
+
+    }
+
+
+    
+ 
+ 
+ 
+});
+ 
+</script>
+</body>
+</html>
